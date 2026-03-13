@@ -1,0 +1,46 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backend uploads/media
+backend/media/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Alembic / local db artifacts
+*.sqlite3
+
+# Logs
+*.log
+
+# Node / frontend
+node_modules/
+.next/
+out/
+dist/
+
+# IDE
+.vscode/
+.idea/
