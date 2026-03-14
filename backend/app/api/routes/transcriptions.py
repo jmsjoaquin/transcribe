@@ -8,6 +8,7 @@ from app.models.user import User
 from app.schemas.transcription import TranscriptRead, TranscriptionJobList, TranscriptionJobRead
 from app.services.transcriptions import (
     TranscriptionError,
+    TranscriptionQueueError,
     build_transcript_download_response,
     create_transcription_job,
     get_job_for_user,
@@ -43,6 +44,8 @@ def upload_transcription(
             language=language,
             model_name=model_name,
         )
+    except TranscriptionQueueError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     except TranscriptionError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

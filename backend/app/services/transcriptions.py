@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 from fastapi import UploadFile
@@ -18,9 +19,14 @@ from app.schemas.transcription import (
     TranscriptionJobRead,
 )
 from app.services.storage import StorageError, delete_local_file, save_upload
+from app.workers.queue import QueueDispatchError, enqueue_transcription_job
 
 
 class TranscriptionError(Exception):
+    pass
+
+
+class TranscriptionQueueError(TranscriptionError):
     pass
 
 
@@ -54,12 +60,21 @@ def create_transcription_job(
     try:
         job_repository.create(db, job)
         db.commit()
+        db.refresh(job)
     except Exception:
         db.rollback()
         delete_local_file(stored_media.storage_path)
         raise
 
-    db.refresh(job)
+    try:
+        enqueue_transcription_job(job)
+    except QueueDispatchError as exc:
+        job.status = TranscriptionJobStatus.FAILED
+        job.error_message = str(exc)
+        job.completed_at = datetime.now(UTC)
+        db.commit()
+        raise TranscriptionQueueError(str(exc)) from exc
+
     return _serialize_job(job)
 
 
