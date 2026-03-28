@@ -40,3 +40,7 @@ class TranscriptionDownloadPayload(BaseModel):
     status: TranscriptionJobStatus
     source_filename: str
     transcript: TranscriptRead
+
+
+class TranscriptionMessage(BaseModel):
+    message: str

@@ -17,6 +17,7 @@ from app.schemas.transcription import (
     TranscriptRead,
     TranscriptionDownloadPayload,
     TranscriptionJobRead,
+    TranscriptionMessage,
 )
 from app.services.storage import StorageError, delete_local_file, save_upload
 from app.workers.queue import QueueDispatchError, enqueue_transcription_job
@@ -131,6 +132,15 @@ def build_transcript_download_response(
         )
 
     raise TranscriptionError("Unsupported download format. Use 'txt' or 'json'.")
+
+
+def delete_job_for_user(db: Session, *, job_id: int, user: User) -> TranscriptionMessage:
+    job = _get_owned_job(db, job_id=job_id, user=user)
+    storage_path = job.storage_path
+    job_repository.delete(db, job)
+    db.commit()
+    delete_local_file(storage_path)
+    return TranscriptionMessage(message="Transcription job deleted.")
 
 
 def _get_owned_job(db: Session, *, job_id: int, user: User) -> TranscriptionJob:

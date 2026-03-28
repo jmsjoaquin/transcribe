@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.session import get_db
-from app.schemas.auth import AuthSession, UserLogin, UserRead, UserRegister
+from app.schemas.auth import AuthMessage, AuthSession, UserLogin, UserRead, UserRegister
 from app.services.auth import AuthError, authenticate_user, register_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -40,3 +40,15 @@ def login(payload: UserLogin, response: Response, db: Session = Depends(get_db))
         message="Login successful.",
         user=UserRead.model_validate(user),
     )
+
+
+@router.post("/logout", response_model=AuthMessage)
+def logout(response: Response) -> AuthMessage:
+    response.delete_cookie(
+        key=settings.access_token_cookie_name,
+        httponly=True,
+        secure=settings.access_token_cookie_secure,
+        samesite="lax",
+        path="/",
+    )
+    return AuthMessage(message="Logout successful.")

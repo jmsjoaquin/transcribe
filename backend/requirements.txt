@@ -9,3 +9,5 @@ email-validator==2.3.0
 python-multipart==0.0.20
 redis==6.4.0
 rq==2.6.0
+httpx==0.28.1
+pytest==8.4.2

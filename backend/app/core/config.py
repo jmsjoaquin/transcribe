@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     worker_media_access_mode: str = "shared_storage"
     worker_name: str = "transcribe-worker"
     worker_platform: str = "macos-dev"
+    worker_use_simple_worker: bool = False
     whisper_model_size: str = "small"
     whisper_device: str = "cpu"
     whisper_compute_type: str = "int8"

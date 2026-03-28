@@ -33,7 +33,7 @@ def enqueue_transcription_job(job: TranscriptionJob) -> str:
         queued_job = queue.enqueue(
             "worker.app.jobs.transcriptions.process_transcription_job",
             message.model_dump(mode="json"),
-            job_id=f"transcription:{job.id}",
+            job_id=f"transcription-{job.id}",
         )
     except Exception as exc:
         raise QueueDispatchError("Failed to enqueue transcription job.") from exc

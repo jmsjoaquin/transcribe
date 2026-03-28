@@ -29,3 +29,7 @@ class UserRead(BaseModel):
 class AuthSession(BaseModel):
     message: str
     user: UserRead
+
+
+class AuthMessage(BaseModel):
+    message: str

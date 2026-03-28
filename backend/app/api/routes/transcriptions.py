@@ -5,12 +5,18 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_user
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.transcription import TranscriptRead, TranscriptionJobList, TranscriptionJobRead
+from app.schemas.transcription import (
+    TranscriptRead,
+    TranscriptionJobList,
+    TranscriptionJobRead,
+    TranscriptionMessage,
+)
 from app.services.transcriptions import (
     TranscriptionError,
     TranscriptionQueueError,
     build_transcript_download_response,
     create_transcription_job,
+    delete_job_for_user,
     get_job_for_user,
     get_job_result_for_user,
     list_jobs_for_user,
@@ -98,3 +104,15 @@ def download_transcription_result(
         if detail == "Transcription job not found.":
             status_code = status.HTTP_404_NOT_FOUND
         raise HTTPException(status_code=status_code, detail=detail) from exc
+
+
+@router.delete("/{job_id}", response_model=TranscriptionMessage)
+def delete_transcription(
+    job_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> TranscriptionMessage:
+    try:
+        return delete_job_for_user(db, job_id=job_id, user=current_user)
+    except TranscriptionError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc

@@ -25,3 +25,7 @@ def list_for_user(db: Session, *, user_id: int, limit: int = 50) -> list[Transcr
         .limit(limit)
     )
     return list(db.scalars(statement))
+
+
+def delete(db: Session, job: TranscriptionJob) -> None:
+    db.delete(job)
